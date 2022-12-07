@@ -8,15 +8,15 @@ import java.util.PriorityQueue;
 
 public class MostCalories {
 
-    static final String FILE_PATH = "/calories.txt";
+    private static final String FILE_PATH = "/calories.txt";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
         final MostCalories mostCalories = new MostCalories();
         System.out.println("Top Elf: " + mostCalories.getMaxCalories(1));
         System.out.println("Top 3 Elves: " + mostCalories.getMaxCalories(3));
     }
 
-    int getMaxCalories(int numberOfElves) throws IOException {
+    int getMaxCalories(final int numberOfElves) throws IOException {
         final InputStream inputStream = this.getClass().getResourceAsStream(FILE_PATH);
         return getMostCaloriesFromInputStream(inputStream, numberOfElves);
     }
