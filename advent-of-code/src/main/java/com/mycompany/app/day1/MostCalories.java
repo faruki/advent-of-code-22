@@ -1,17 +1,17 @@
-package com.mycompany.app;
+package com.mycompany.app.day1;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class Day1CalorieCounting {
+public class MostCalories {
 
     private static final String FILE_PATH = "/calories.txt";
 
     public static void main(String[] args) throws IOException {
-        final Day1CalorieCounting day1CalorieCounting = new Day1CalorieCounting();
-        System.out.println(day1CalorieCounting.getMaxCalories());
+        final MostCalories mostCalories = new MostCalories();
+        System.out.println(mostCalories.getMaxCalories());
     }
 
     private int getMaxCalories() throws IOException {
