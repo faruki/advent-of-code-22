@@ -4,39 +4,49 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.PriorityQueue;
 
 public class MostCalories {
 
-    private static final String FILE_PATH = "/calories.txt";
+    static final String FILE_PATH = "/calories.txt";
 
     public static void main(String[] args) throws IOException {
         final MostCalories mostCalories = new MostCalories();
-        System.out.println(mostCalories.getMaxCalories());
+        System.out.println("Top Elf: " + mostCalories.getMaxCalories(1));
+        System.out.println("Top 3 Elves: " + mostCalories.getMaxCalories(3));
     }
 
-    private int getMaxCalories() throws IOException {
-        return calculateDataFromFile();
-    }
-
-    private int calculateDataFromFile() throws IOException {
+    int getMaxCalories(int numberOfElves) throws IOException {
         final InputStream inputStream = this.getClass().getResourceAsStream(FILE_PATH);
-        return readFromInputStream(inputStream);
+        return getMostCaloriesFromInputStream(inputStream, numberOfElves);
     }
 
-    private int readFromInputStream(final InputStream inputStream) throws IOException {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+    private int getMostCaloriesFromInputStream(final InputStream inputStream, final int numberOfElves) throws IOException {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
-            int maxCalories = 0;
+            final PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
             int currentCalories = 0;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0) {
                     currentCalories += Integer.parseInt(line);
                 } else {
-                    maxCalories = Math.max(currentCalories, maxCalories);
+                    priorityQueue.add(currentCalories);
+                    if (priorityQueue.size() > numberOfElves) {
+                        priorityQueue.poll();
+                    }
                     currentCalories = 0;
                 }
             }
-            return Math.max(currentCalories, maxCalories);
+            priorityQueue.add(currentCalories);
+            if (priorityQueue.size() > numberOfElves) {
+                priorityQueue.poll();
+            }
+
+            int totalCalories = 0;
+            while (!priorityQueue.isEmpty()) {
+                totalCalories += priorityQueue.poll();
+            }
+            return totalCalories;
         }
     }
 }
