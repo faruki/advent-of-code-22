@@ -11,29 +11,31 @@ public class RockPaperScissors {
 
     public static void main(final String[] args) throws IOException {
         final RockPaperScissors rockPaperScissors = new RockPaperScissors();
-        System.out.println("My total score: " + rockPaperScissors.calculateOverallScore());
+        System.out.println("My total score: " + rockPaperScissors.calculateOverallScore(false));
+        System.out.println("My total score following strategy: " + rockPaperScissors.calculateOverallScore(true));
     }
 
-    private int calculateOverallScore() throws IOException {
+    int calculateOverallScore(final boolean hasStrategy) throws IOException {
         final InputStream inputStream = this.getClass().getResourceAsStream(FILE_PATH);
-        return collectScoreFromInputStream(inputStream);
+        return collectScoreFromInputStream(inputStream, hasStrategy);
     }
 
-    private int collectScoreFromInputStream(final InputStream inputStream) throws IOException {
+    private int collectScoreFromInputStream(final InputStream inputStream, final boolean hasStrategy) throws IOException {
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             int totalScore = 0;
             while ((line = br.readLine()) != null) {
                 final String[] roundAsStringArray = line.split(" ");
-                totalScore += getRoundScore(roundAsStringArray[0].charAt(0), roundAsStringArray[1].charAt(0));
+                totalScore += getRoundScore(roundAsStringArray[0].charAt(0), roundAsStringArray[1].charAt(0), hasStrategy);
             }
             return totalScore;
         }
     }
 
-    private int getRoundScore(final char opponentChoice, final char myChoice) {
-        final int shapeScore = getScoreBasedOnShape(myChoice);
-        final int outcomeScore = getOutcomeScore(opponentChoice, myChoice);
+    private int getRoundScore(final char opponentChoice, final char myChoice, final boolean hasStrategy) {
+        char myRealChoice = hasStrategy ? getMyChoiceBasedOnOpponent(opponentChoice, myChoice) : myChoice;
+        final int shapeScore = getScoreBasedOnShape(myRealChoice);
+        final int outcomeScore = getOutcomeScore(opponentChoice, myRealChoice);
         return shapeScore + outcomeScore;
     }
 
@@ -49,6 +51,42 @@ public class RockPaperScissors {
             case 'Z':
             default:
                 return 3;
+        }
+    }
+
+    private char getMyChoiceBasedOnOpponent(final char opponentChoice, final char strategy) {
+        switch (strategy) {
+            case 'X':
+                return getLosingChoice(opponentChoice);
+            case 'Y':
+                return opponentChoice;
+            case 'Z':
+            default:
+                return getWinningChoice(opponentChoice);
+        }
+    }
+
+    private char getLosingChoice(final char opponentChoice) {
+        switch (opponentChoice) {
+            case 'A':
+                return 'C';
+            case 'B':
+                return 'A';
+            case 'C':
+            default:
+                return 'B';
+        }
+    }
+
+    private char getWinningChoice(final char opponentChoice) {
+        switch (opponentChoice) {
+            case 'A':
+                return 'B';
+            case 'B':
+                return 'C';
+            case 'C':
+            default:
+                return 'A';
         }
     }
 
