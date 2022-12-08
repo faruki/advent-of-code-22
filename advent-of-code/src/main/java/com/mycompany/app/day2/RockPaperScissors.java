@@ -33,7 +33,7 @@ public class RockPaperScissors {
     }
 
     private int getRoundScore(final char opponentChoice, final char myChoice, final boolean hasStrategy) {
-        char myRealChoice = hasStrategy ? getMyChoiceBasedOnOpponent(opponentChoice, myChoice) : myChoice;
+        final char myRealChoice = hasStrategy ? getMyChoiceBasedOnOpponent(opponentChoice, myChoice) : myChoice;
         final int shapeScore = getScoreBasedOnShape(myRealChoice);
         final int outcomeScore = getOutcomeScore(opponentChoice, myRealChoice);
         return shapeScore + outcomeScore;
