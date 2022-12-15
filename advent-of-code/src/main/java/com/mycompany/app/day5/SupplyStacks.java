@@ -4,149 +4,190 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
- * --- Day 4: Camp Cleanup ---
+ * --- Day 5: Supply Stacks ---
  * <p>
- * Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique ID number, and each Elf is assigned a range of section IDs.
+ * The expedition can depart as soon as the final supplies have been unloaded from the ships. Supplies are stored in stacks of marked crates, but because the needed supplies are buried under many other crates, the crates need to be rearranged.
  * <p>
- * However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments overlap. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a big list of the section assignments for each pair (your puzzle input).
+ * The ship has a giant cargo crane capable of moving crates between stacks. To ensure none of the crates get crushed or fall over, the crane operator will rearrange them in a series of carefully-planned steps. After the crates are rearranged, the desired crates will be at the top of each stack.
  * <p>
- * For example, consider the following list of section assignment pairs:
+ * The Elves don't want to interrupt the crane operator during this delicate procedure, but they forgot to ask her which crate will end up where, and they want to be ready to unload them as soon as possible so they can embark.
  * <p>
- * 2-4,6-8
- * 2-3,4-5
- * 5-7,7-9
- * 2-8,3-7
- * 6-6,4-6
- * 2-6,4-8
- * For the first few pairs, this list means:
+ * They do, however, have a drawing of the starting stacks of crates and the rearrangement procedure (your puzzle input). For example:
  * <p>
- * Within the first pair of Elves, the first Elf was assigned sections 2-4 (sections 2, 3, and 4), while the second Elf was assigned sections 6-8 (sections 6, 7, 8).
- * The Elves in the second pair were each assigned two sections.
- * The Elves in the third pair were each assigned three sections: one got sections 5, 6, and 7, while the other also got 7, plus 8 and 9.
- * This example list uses single-digit section IDs to make it easier to draw; your actual list might contain larger numbers. Visually, these pairs of section assignments look like this:
+ * [D]
+ * [N] [C]
+ * [Z] [M] [P]
+ * 1   2   3
  * <p>
- * .234.....  2-4
- * .....678.  6-8
+ * move 1 from 2 to 1
+ * move 3 from 1 to 3
+ * move 2 from 2 to 1
+ * move 1 from 1 to 2
+ * In this example, there are three stacks of crates. Stack 1 contains two crates: crate Z is on the bottom, and crate N is on top. Stack 2 contains three crates; from bottom to top, they are crates M, C, and D. Finally, stack 3 contains a single crate, P.
  * <p>
- * .23......  2-3
- * ...45....  4-5
+ * Then, the rearrangement procedure is given. In each step of the procedure, a quantity of crates is moved from one stack to a different stack. In the first step of the above rearrangement procedure, one crate is moved from stack 2 to stack 1, resulting in this configuration:
  * <p>
- * ....567..  5-7
- * ......789  7-9
+ * [D]
+ * [N] [C]
+ * [Z] [M] [P]
+ * 1   2   3
+ * In the second step, three crates are moved from stack 1 to stack 3. Crates are moved one at a time, so the first crate to be moved (D) ends up below the second and third crates:
  * <p>
- * .2345678.  2-8
- * ..34567..  3-7
+ * [Z]
+ * [N]
+ * [C] [D]
+ * [M] [P]
+ * 1   2   3
+ * Then, both crates are moved from stack 2 to stack 1. Again, because crates are moved one at a time, crate C ends up below crate M:
  * <p>
- * .....6...  6-6
- * ...456...  4-6
+ * [Z]
+ * [N]
+ * [M]     [D]
+ * [C]     [P]
+ * 1   2   3
+ * Finally, one crate is moved from stack 1 to stack 2:
  * <p>
- * .23456...  2-6
- * ...45678.  4-8
- * Some of the pairs have noticed that one of their assignments fully contains the other. For example, 2-8 fully contains 3-7, and 6-6 is fully contained by 4-6. In pairs where one assignment fully contains the other, one Elf in the pair would be exclusively cleaning sections their partner will already be cleaning, so these seem like the most in need of reconsideration. In this example, there are 2 such pairs.
+ * [Z]
+ * [N]
+ * [D]
+ * [C] [M] [P]
+ * 1   2   3
+ * The Elves just need to know which crate will end up on top of each stack; in this example, the top crates are C in stack 1, M in stack 2, and Z in stack 3, so you should combine these together and give the Elves the message CMZ.
  * <p>
- * In how many assignment pairs does one range fully contain the other?
+ * After the rearrangement procedure completes, what crate ends up on top of each stack?
  * <p>
- * Your puzzle answer was 582.
+ * Your puzzle answer was QNNTGTPFN.
  * <p>
  * --- Part Two ---
- * It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that overlap at all.
+ * As you watch the crane operator expertly rearrange the crates, you notice the process isn't following your prediction.
  * <p>
- * In the above example, the first two pairs (2-4,6-8 and 2-3,4-5) don't overlap, while the remaining four pairs (5-7,7-9, 2-8,3-7, 6-6,4-6, and 2-6,4-8) do overlap:
+ * Some mud was covering the writing on the side of the crane, and you quickly wipe it away. The crane isn't a CrateMover 9000 - it's a CrateMover 9001.
  * <p>
- * 5-7,7-9 overlaps in a single section, 7.
- * 2-8,3-7 overlaps all of the sections 3 through 7.
- * 6-6,4-6 overlaps in a single section, 6.
- * 2-6,4-8 overlaps in sections 4, 5, and 6.
- * So, in this example, the number of overlapping assignment pairs is 4.
+ * The CrateMover 9001 is notable for many new and exciting features: air conditioning, leather seats, an extra cup holder, and the ability to pick up and move multiple crates at once.
  * <p>
- * In how many assignment pairs do the ranges overlap?
+ * Again considering the example above, the crates begin in the same configuration:
  * <p>
- * Your puzzle answer was 893.
+ * [D]
+ * [N] [C]
+ * [Z] [M] [P]
+ * 1   2   3
+ * Moving a single crate from stack 2 to stack 1 behaves the same as before:
+ * <p>
+ * [D]
+ * [N] [C]
+ * [Z] [M] [P]
+ * 1   2   3
+ * However, the action of moving three crates from stack 1 to stack 3 means that those three moved crates stay in the same order, resulting in this new configuration:
+ * <p>
+ * [D]
+ * [N]
+ * [C] [Z]
+ * [M] [P]
+ * 1   2   3
+ * Next, as both crates are moved from stack 2 to stack 1, they retain their order as well:
+ * <p>
+ * [D]
+ * [N]
+ * [C]     [Z]
+ * [M]     [P]
+ * 1   2   3
+ * Finally, a single crate is still moved from stack 1 to stack 2, but now it's crate C that gets moved:
+ * <p>
+ * [D]
+ * [N]
+ * [Z]
+ * [M] [C] [P]
+ * 1   2   3
+ * In this example, the CrateMover 9001 has put the crates in a totally different order: MCD.
+ * <p>
+ * Before the rearrangement process finishes, update your simulation so that the Elves know where they should stand to be ready to unload the final supplies. After the rearrangement procedure completes, what crate ends up on top of each stack?
+ * <p>
+ * Your puzzle answer was GGNPJBTTR.
  */
 public class SupplyStacks {
 
-    private static final String FILE_PATH = "/camp_cleanup.txt";
+    private static final String FILE_PATH = "/supply_stacks.txt";
+    private static final String MOVE = "move";
 
     public static void main(final String[] args) throws IOException {
-        final SupplyStacks campCleanup = new SupplyStacks();
-        System.out.println("Number of union pairs: " + campCleanup.getContainingPairs(true));
-        System.out.println("Number of intersecting pairs: " + campCleanup.getContainingPairs(false));
+        final SupplyStacks supplyStacks = new SupplyStacks();
+        System.out.println("Combination of top crates using crane 9000: " + supplyStacks.getTopCrates(true));
+        System.out.println("Combination of top crates using crane 9001: " + supplyStacks.getTopCrates(false));
     }
 
-    int getContainingPairs(final boolean isUnion) throws IOException {
+    String getTopCrates(final boolean moveSingleCrates) throws IOException {
         final InputStream inputStream = this.getClass().getResourceAsStream(FILE_PATH);
-        return getContainingPairs(inputStream, isUnion);
+        return getTopCrates(inputStream, moveSingleCrates);
     }
 
-    private int getContainingPairs(final InputStream inputStream, final boolean isUnion) throws IOException {
+    private String getTopCrates(final InputStream inputStream, final boolean moveSingleCrates) throws IOException {
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            Deque<Character>[] stackArray = new ArrayDeque[0];
+            boolean firstLine = true;
             String line;
-            int containingPairs = 0;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0) {
-                    final String[] pairsArray = line.split(",");
-                    final String[] firstRange = pairsArray[0].split("-");
-                    final String[] secondRange = pairsArray[1].split("-");
-                    if (isUnionOrIntersection(firstRange, secondRange, isUnion)) {
-                        containingPairs++;
+                    if (firstLine) {
+                        final int numberOfStacks = (line.length() + 1) / 4;
+                        stackArray = initStackArray(numberOfStacks);
+                        firstLine = false;
+                    }
+                    if (line.startsWith("[")) {
+                        insertIntoStack(stackArray, line);
+                    } else {
+                        final String[] inputArray = line.split(" ");
+                        if (MOVE.equals(inputArray[0])) {
+                            move(stackArray, moveSingleCrates, Integer.parseInt(inputArray[1]), Integer.parseInt(inputArray[3]), Integer.parseInt(inputArray[5]));
+                        }
                     }
                 }
             }
-            return containingPairs;
+            return topCratesToString(stackArray);
         }
     }
 
-    private boolean isUnionOrIntersection(final String[] firstRange, final String[] secondRange, final boolean isUnion) {
-        final Range[] rangeArray = {new Range(firstRange), new Range(secondRange)};
-        Arrays.sort(rangeArray);
-        final Range smallerMinRange = rangeArray[0];
-        final Range largerMinRange = rangeArray[1];
-        return isUnion ? isUnion(smallerMinRange, largerMinRange) : isIntersection(smallerMinRange, largerMinRange);
-    }
-
-    private boolean isIntersection(final Range smallerMinRange, final Range largerMinRange) {
-        return smallerMinRange.getMax() >= largerMinRange.getMin();
-    }
-
-    private boolean isUnion(final Range smallerMinRange, final Range largerMinRange) {
-        return smallerMinRange.getMax() >= largerMinRange.getMax();
-    }
-
-    private static class Range implements Comparable<Range> {
-
-        private final int min;
-        private final int max;
-
-        Range(String[] range) {
-            this.min = Integer.parseInt(range[0]);
-            this.max = Integer.parseInt(range[1]);
+    private Deque<Character>[] initStackArray(final int size) {
+        final Deque<Character>[] stackArray = new ArrayDeque[size];
+        for (int i = 0; i < size; i++) {
+            stackArray[i] = new ArrayDeque<>();
         }
+        return stackArray;
+    }
 
-        /**
-         * Range compareTo method
-         * @param other the object to be compared.
-         * @return Range with smaller min first. In case of equal min value, return Range with larger Max first
-         */
-        @Override
-        public int compareTo(Range other) {
-            if (this.min < other.min) {
-                return -1;
+    private String topCratesToString(final Deque<Character>[] stackArray) {
+        StringBuilder result = new StringBuilder();
+        for (Deque<Character> stack : stackArray) {
+            result.append(stack.pop());
+        }
+        return result.toString();
+    }
+
+    private void insertIntoStack(final Deque<Character>[] stackArray, final String line) {
+        for (int i = 1; i < line.length(); i += 4) {
+            char currentChar = line.charAt(i);
+            if (currentChar != ' ') {
+                stackArray[i / 4].addLast(currentChar);
             }
-            if (this.min > other.min) {
-                return 1;
+        }
+    }
+
+    private void move(final Deque<Character>[] stackArray, final boolean moveSingleCrates, final int amount, final int fromStack, final int toStack) {
+        if (moveSingleCrates) {
+            for (int i = 0; i < amount; i++) {
+                stackArray[toStack - 1].push(stackArray[fromStack - 1].pop());
             }
-            return other.max - this.max;
-        }
-
-        public int getMin() {
-            return min;
-        }
-
-        public int getMax() {
-            return max;
+        } else {
+            final Deque<Character> tempStack = new ArrayDeque<>();
+            for (int i = 0; i < amount; i++) {
+                tempStack.push(stackArray[fromStack - 1].pop());
+            }
+            for (int i = 0; i < amount; i++) {
+                stackArray[toStack - 1].push(tempStack.pop());
+            }
         }
     }
 }
