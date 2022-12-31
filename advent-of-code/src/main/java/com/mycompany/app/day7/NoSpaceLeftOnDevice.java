@@ -218,7 +218,7 @@ public class NoSpaceLeftOnDevice {
         return currentNode.getChildren().get(destinationDirectory);
     }
 
-    private class Node {
+    private static class Node {
         private String name;
         private int size;
         private boolean isDir;
